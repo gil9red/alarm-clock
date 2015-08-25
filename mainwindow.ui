@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>234</width>
-    <height>122</height>
+    <height>178</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QRadioButton" name="radioButton">
+       <widget class="QRadioButton" name="at_time_rb">
         <property name="text">
          <string>В заданное время</string>
         </property>
@@ -28,7 +28,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QTimeEdit" name="atTime">
+       <widget class="QTimeEdit" name="at_time">
         <property name="time">
          <time>
           <hour>7</hour>
@@ -39,14 +39,14 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QRadioButton" name="radioButton_2">
+       <widget class="QRadioButton" name="through_time_rb">
         <property name="text">
          <string>Через заданное время</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QTimeEdit" name="throughTime">
+       <widget class="QTimeEdit" name="through_time">
         <property name="time">
          <time>
           <hour>0</hour>
@@ -59,32 +59,35 @@
      </layout>
     </item>
     <item>
-     <widget class="QLabel" name="timeRemaining">
+     <widget class="QLabel" name="time_remaining">
       <property name="text">
        <string>Осталось: </string>
       </property>
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="startStop">
-        <property name="text">
-         <string>Запустить</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="moreSleep">
-        <property name="text">
-         <string>Еще поспать</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QPushButton" name="start_stop">
+      <property name="text">
+       <string>Запустить</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="i_woke_up">
+      <property name="text">
+       <string>Я проснулся</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="more_sleep">
+      <property name="text">
+       <string>Еще поспать</string>
+      </property>
+     </widget>
     </item>
     <item>
      <spacer name="verticalSpacer">
