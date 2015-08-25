@@ -37,15 +37,21 @@ class MainWindow(QMainWindow, QObject):
         self._timer_inc_volume.setInterval(500)
         self._timer_inc_volume.timeout.connect(self._inc_volume_tick)
 
+        self.audio_file_name = audio_file_name
+
         self.audio = Phonon.MediaObject()
         self.audio.setCurrentSource(Phonon.MediaSource(audio_file_name))
-        self.audio.finished.connect(self.audio.play)
+        self.audio.finished.connect(self._restart_audio)
 
         self.output = Phonon.AudioOutput(Phonon.MusicCategory)
 
         Phonon.createPath(self.audio, self.output)
 
         self._update_states()
+
+    def _restart_audio(self):
+        self.audio.setCurrentSource(Phonon.MediaSource(self.audio_file_name))
+        self.audio.play()
 
     def _update_states(self):
         self.ui.at_time.setEnabled(self.ui.at_time_rb.isChecked())
@@ -80,9 +86,9 @@ class MainWindow(QMainWindow, QObject):
             self._timer.stop()
             self._update_states()
 
-            self.output.setVolume(0.1)
+            self.output.setVolume(0.01)
             self.audio.play()
-            # self._timer_inc_volume.start()
+            self._timer_inc_volume.start()
 
         h = int(remain / 3600)
         m = int((remain - h * 3600) / 60)
