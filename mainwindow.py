@@ -133,7 +133,7 @@ class MainWindow(QMainWindow, QObject):
     def _more_sleep(self):
         self._i_woke_up()
 
-        self._alarm_time = self._alarm_time.addSecs(15 * 60)
+        self._alarm_time = QTime.currentTime().addSecs(15 * 60)
         self._timer.start()
         self.ui.start_stop.setChecked(True)
         self._update_states()
