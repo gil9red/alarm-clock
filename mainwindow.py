@@ -3,6 +3,10 @@
 
 __author__ = 'ipetrash'
 
+
+# TODO: переписать на Qt5
+# TODO: добавить батник сборки ехе через pyinstaller
+
 from PySide.QtGui import *
 from PySide.QtCore import *
 from PySide.phonon import Phonon
