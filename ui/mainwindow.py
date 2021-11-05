@@ -4,14 +4,14 @@
 __author__ = 'ipetrash'
 
 
-from PyQt5.QtWidgets import QMainWindow, QButtonGroup
-from PyQt5.QtGui import QCloseEvent
-from PyQt5.QtCore import QTimer, QTime, QUrl, QSettings
+from PyQt5.QtWidgets import QMainWindow, QButtonGroup, QSystemTrayIcon
+from PyQt5.QtGui import QCloseEvent, QIcon
+from PyQt5.QtCore import QTimer, QTime, QUrl, QSettings, QEvent
 from PyQt5.QtMultimedia import QMediaPlaylist, QMediaPlayer, QMediaContent
 
 from ui.mainwindow_ui import Ui_MainWindow
 
-from config import SETTINGS_FILE_NAME
+from config import SETTINGS_FILE_NAME, DIR_ICONS
 
 
 def get_total_seconds(t: QTime) -> int:
@@ -29,6 +29,15 @@ class MainWindow(QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.icon_alarm_clock = QIcon(str(DIR_ICONS / 'alarm-clock.png'))
+
+        self.setWindowIcon(self.icon_alarm_clock)
+
+        self.tray = QSystemTrayIcon(self.icon_alarm_clock)
+        self.tray.setToolTip(self.windowTitle())
+        self.tray.activated.connect(self._on_tray_activated)
+        self.tray.show()
 
         self.read_settings()
 
@@ -98,6 +107,7 @@ class MainWindow(QMainWindow):
             self.player.setVolume(1)
             self.player.play()
             self._timer_inc_volume.start()
+            self._set_visible(True)
 
         hh, mm = divmod(remain, 3600)
         mm, ss = divmod(mm, 60)
@@ -142,6 +152,23 @@ class MainWindow(QMainWindow):
         self._timer.start()
         self.ui.start_stop.setChecked(True)
         self._update_states()
+
+    def _set_visible(self, visible: bool):
+        self.setVisible(visible)
+
+        if visible:
+            self.showNormal()
+            self.activateWindow()
+
+    def _on_tray_activated(self, reason):
+        self._set_visible(not self.isVisible())
+
+    def changeEvent(self, event: QEvent):
+        if event.type() == QEvent.WindowStateChange:
+            # Если окно свернули
+            if self.isMinimized():
+                # Прячем окно с панели задач
+                QTimer.singleShot(0, self.hide)
 
     def read_settings(self):
         ini = QSettings(SETTINGS_FILE_NAME, QSettings.IniFormat)
