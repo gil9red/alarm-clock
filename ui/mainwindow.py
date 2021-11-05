@@ -87,7 +87,8 @@ class MainWindow(QMainWindow):
         else:
             self.ui.start_stop.setText('Запустить')
 
-        self.resize(self.minimumSize())
+        # Корректируем высоту окна после возможного скрытия кнопок
+        self.resize(self.width(), self.minimumHeight())
 
     def _inc_volume_tick(self):
         if self.player.volume() >= 100:

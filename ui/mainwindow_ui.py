@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(324, 221)
+        MainWindow.resize(324, 214)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -41,6 +41,8 @@ class Ui_MainWindow(object):
         self.time_remaining = QtWidgets.QLabel(self.centralwidget)
         self.time_remaining.setObjectName("time_remaining")
         self.verticalLayout.addWidget(self.time_remaining)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem)
         self.start_stop = QtWidgets.QPushButton(self.centralwidget)
         self.start_stop.setCheckable(True)
         self.start_stop.setObjectName("start_stop")
@@ -51,8 +53,6 @@ class Ui_MainWindow(object):
         self.more_sleep = QtWidgets.QPushButton(self.centralwidget)
         self.more_sleep.setObjectName("more_sleep")
         self.verticalLayout.addWidget(self.more_sleep)
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
