@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>234</width>
-    <height>178</height>
+    <width>324</width>
+    <height>221</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Будильник</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -29,9 +29,12 @@
       </item>
       <item row="0" column="1">
        <widget class="QTimeEdit" name="at_time">
+        <property name="displayFormat">
+         <string>HH:mm:ss</string>
+        </property>
         <property name="time">
          <time>
-          <hour>7</hour>
+          <hour>9</hour>
           <minute>0</minute>
           <second>0</second>
          </time>
@@ -47,10 +50,16 @@
       </item>
       <item row="1" column="1">
        <widget class="QTimeEdit" name="through_time">
+        <property name="currentSection">
+         <enum>QDateTimeEdit::HourSection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>HH:mm:ss</string>
+        </property>
         <property name="time">
          <time>
           <hour>0</hour>
-          <minute>45</minute>
+          <minute>10</minute>
           <second>0</second>
          </time>
         </property>

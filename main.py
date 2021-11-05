@@ -4,33 +4,18 @@
 __author__ = 'ipetrash'
 
 
-# TODO: сделать версию функции для PySide/PyQt4/PyQt5
-def load_qt4_plugins():
-    """
-    Функция загружает Qt плагины.
-
-    """
-
-    import PySide
-    import os
-
-    qApp = PySide.QtGui.QApplication.instance()
-
-    for plugins_dir in [os.path.join(p, "plugins") for p in PySide.__path__]:
-        qApp.addLibraryPath(plugins_dir)
+# TODO: добавить батник сборки ехе через pyinstaller
 
 
-if __name__ == '__main__':
-    import sys
-    from PySide.QtGui import QApplication
-    from mainwindow import MainWindow
+import sys
 
-    app = QApplication(sys.argv)
+from PyQt5.QtWidgets import QApplication
+from ui.mainwindow import MainWindow
 
-    load_qt4_plugins()
 
-    mw = MainWindow('Пилигрим - Стереть.mp3')
-    mw.setWindowTitle('Будильник')
-    mw.show()
+app = QApplication(sys.argv)
 
-    sys.exit(app.exec_())
+mw = MainWindow(r'C:\Users\ipetrash\Music\Эпоха – Ценой великих жертв.mp3')
+mw.show()
+
+sys.exit(app.exec_())

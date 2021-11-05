@@ -2,8 +2,8 @@
 Будильник (#python #python3 #alarmclock #PySide #Qt)
 
 ##### Скриншоты:
-![](screenshot.png)
+![](screenshots/1.png)
 
-![](screenshot_2.png)
+![](screenshots/2.png)
 
-![](screenshot_3.png)
+![](screenshots/3.png)
