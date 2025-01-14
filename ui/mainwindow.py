@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = 'ipetrash'
+__author__ = "ipetrash"
 
 
 from PyQt5.QtWidgets import QMainWindow, QButtonGroup, QSystemTrayIcon
@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.icon_alarm_clock = QIcon(str(DIR_ICONS / 'alarm-clock.png'))
+        self.icon_alarm_clock = QIcon(str(DIR_ICONS / "alarm-clock.png"))
 
         self.setWindowIcon(self.icon_alarm_clock)
 
@@ -83,9 +83,9 @@ class MainWindow(QMainWindow):
 
         self.ui.start_stop.setVisible(not self._woke_up)
         if self.ui.start_stop.isChecked():
-            self.ui.start_stop.setText('Стоп')
+            self.ui.start_stop.setText("Стоп")
         else:
-            self.ui.start_stop.setText('Запустить')
+            self.ui.start_stop.setText("Запустить")
 
         # Корректируем высоту окна после возможного скрытия кнопок
         self.resize(self.width(), self.minimumHeight())
@@ -113,8 +113,10 @@ class MainWindow(QMainWindow):
         hh, mm = divmod(remain, 3600)
         mm, ss = divmod(mm, 60)
 
-        alarm_str = self._alarm_time.toString('hh:mm:ss')
-        self.ui.time_remaining.setText(f"Звонок в {alarm_str}. Осталось: {hh:0>2}:{mm:0>2}:{ss:0>2}")
+        alarm_str = self._alarm_time.toString("hh:mm:ss")
+        self.ui.time_remaining.setText(
+            f"Звонок в {alarm_str}. Осталось: {hh:0>2}:{mm:0>2}:{ss:0>2}"
+        )
 
     def _i_woke_up(self):
         self._woke_up = False
@@ -174,33 +176,33 @@ class MainWindow(QMainWindow):
     def read_settings(self):
         ini = QSettings(SETTINGS_FILE_NAME, QSettings.IniFormat)
 
-        if state := ini.value('MainWindow_State'):
+        if state := ini.value("MainWindow_State"):
             self.restoreState(state)
 
-        if geometry := ini.value('MainWindow_Geometry'):
+        if geometry := ini.value("MainWindow_Geometry"):
             self.restoreGeometry(geometry)
 
-        if at_time_rb := ini.value('at_time_rb', type=bool):
+        if at_time_rb := ini.value("at_time_rb", type=bool):
             self.ui.at_time_rb.setChecked(at_time_rb)
 
-        if through_time_rb := ini.value('through_time_rb', type=bool):
+        if through_time_rb := ini.value("through_time_rb", type=bool):
             self.ui.through_time_rb.setChecked(through_time_rb)
 
-        if at_time := ini.value('at_time'):
+        if at_time := ini.value("at_time"):
             self.ui.at_time.setTime(at_time)
 
-        if through_time := ini.value('through_time'):
+        if through_time := ini.value("through_time"):
             self.ui.through_time.setTime(through_time)
 
     def write_settings(self):
         ini = QSettings(SETTINGS_FILE_NAME, QSettings.IniFormat)
-        ini.setValue('MainWindow_State', self.saveState())
-        ini.setValue('MainWindow_Geometry', self.saveGeometry())
+        ini.setValue("MainWindow_State", self.saveState())
+        ini.setValue("MainWindow_Geometry", self.saveGeometry())
 
-        ini.setValue('at_time_rb', self.ui.at_time_rb.isChecked())
-        ini.setValue('through_time_rb', self.ui.through_time_rb.isChecked())
-        ini.setValue('at_time', self.ui.at_time.time())
-        ini.setValue('through_time', self.ui.through_time.time())
+        ini.setValue("at_time_rb", self.ui.at_time_rb.isChecked())
+        ini.setValue("through_time_rb", self.ui.through_time_rb.isChecked())
+        ini.setValue("at_time", self.ui.at_time.time())
+        ini.setValue("through_time", self.ui.through_time.time())
 
     def closeEvent(self, event: QCloseEvent):
         self.write_settings()

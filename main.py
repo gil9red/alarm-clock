@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = 'ipetrash'
+__author__ = "ipetrash"
 
 
 # TODO: добавить батник сборки ехе через pyinstaller
@@ -19,7 +19,7 @@ font = app.font()
 font.setPointSize(font.pointSize() + 8)
 app.setFont(font)
 
-mw = MainWindow(r'C:\Users\ipetrash\Music\Эпоха – Ценой великих жертв.mp3')
+mw = MainWindow(r"C:\Users\ipetrash\Music\Эпоха – Ценой великих жертв.mp3")
 mw.show()
 
 sys.exit(app.exec_())
