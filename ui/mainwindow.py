@@ -4,10 +4,10 @@
 __author__ = "ipetrash"
 
 
-from PyQt5.QtWidgets import QMainWindow, QButtonGroup, QSystemTrayIcon
-from PyQt5.QtGui import QCloseEvent, QIcon
 from PyQt5.QtCore import QTimer, QTime, QUrl, QSettings, QEvent
+from PyQt5.QtGui import QCloseEvent, QIcon
 from PyQt5.QtMultimedia import QMediaPlaylist, QMediaPlayer, QMediaContent
+from PyQt5.QtWidgets import QMainWindow, QButtonGroup, QSystemTrayIcon, QMenu
 
 from ui.mainwindow_ui import Ui_MainWindow
 
@@ -34,7 +34,12 @@ class MainWindow(QMainWindow):
 
         self.setWindowIcon(self.icon_alarm_clock)
 
+        menu_tray = QMenu()
+        action_exit = menu_tray.addAction("Выйти")
+        action_exit.triggered.connect(super().close)
+
         self.tray = QSystemTrayIcon(self.icon_alarm_clock)
+        self.tray.setContextMenu(menu_tray)
         self.tray.setToolTip(self.windowTitle())
         self.tray.activated.connect(self._on_tray_activated)
         self.tray.show()
@@ -163,7 +168,10 @@ class MainWindow(QMainWindow):
             self.showNormal()
             self.activateWindow()
 
-    def _on_tray_activated(self, reason):
+    def _on_tray_activated(self, reason: QSystemTrayIcon.ActivationReason):
+        if reason == QSystemTrayIcon.ActivationReason.Context:
+            return
+
         self._set_visible(not self.isVisible())
 
     def changeEvent(self, event: QEvent):
