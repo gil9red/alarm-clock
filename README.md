@@ -2,11 +2,11 @@
 Будильник (#python #python3 #alarmclock #PyQt5 #Qt)
 
 ##### Скриншоты:
-![](screenshots/1.png)
+![](resources/screenshots/1.png)
 
-![](screenshots/2.png)
+![](resources/screenshots/2.png)
 
-![](screenshots/3.png)
+![](resources/screenshots/3.png)
 
 ##### 
 
