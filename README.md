@@ -8,7 +8,9 @@
 
 ![](resources/screenshots/3.png)
 
-##### 
+##### Настройки:
+
+Другую мелодию можно задать через аргумент *--music_file* пример см. в [resources/examples/run_with_other_music.bat](resources%2Fexamples%2Frun_with_other_music.bat)
 
 ---
 
