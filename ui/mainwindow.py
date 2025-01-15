@@ -4,12 +4,19 @@
 __author__ = "ipetrash"
 
 
+import sys
 from pathlib import Path
 
 from PyQt5.QtCore import QTimer, QTime, QUrl, QSettings, QEvent
 from PyQt5.QtGui import QCloseEvent, QIcon
 from PyQt5.QtMultimedia import QMediaPlaylist, QMediaPlayer, QMediaContent
-from PyQt5.QtWidgets import QMainWindow, QButtonGroup, QSystemTrayIcon, QMenu
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QButtonGroup,
+    QSystemTrayIcon,
+    QMenu,
+    QMessageBox,
+)
 
 from ui.mainwindow_ui import Ui_MainWindow
 
@@ -26,11 +33,16 @@ def add_to_current_time(t: QTime) -> QTime:
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, audio_file_name: str | Path):
+    def __init__(self, audio_file_name: Path):
         super().__init__()
 
-        if isinstance(audio_file_name, Path):
-            audio_file_name = str(audio_file_name)
+        if not audio_file_name.exists():
+            QMessageBox.warning(
+                self,
+                "Файл не существует",
+                f'Не найден файл "{audio_file_name}"',
+            )
+            sys.exit(1)
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -76,7 +88,7 @@ class MainWindow(QMainWindow):
         self.playlist = QMediaPlaylist()
         self.playlist.setPlaybackMode(QMediaPlaylist.Loop)
 
-        url = QUrl.fromLocalFile(audio_file_name)
+        url = QUrl.fromLocalFile(str(audio_file_name))
         self.playlist.addMedia(QMediaContent(url))
 
         self.player = QMediaPlayer()
