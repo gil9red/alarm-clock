@@ -8,10 +8,23 @@ __author__ = "ipetrash"
 
 
 import sys
+from argparse import ArgumentParser
+from pathlib import Path
 
 from PyQt5.QtWidgets import QApplication
+
+from config import MUSIC_PATH
 from ui.mainwindow import MainWindow
 
+
+arg_parser = ArgumentParser()
+arg_parser.add_argument(
+    "--music_file",
+    type=Path,
+    default=MUSIC_PATH,
+)
+
+parsed_args = arg_parser.parse_args()
 
 app = QApplication(sys.argv)
 
@@ -19,7 +32,7 @@ font = app.font()
 font.setPointSize(font.pointSize() + 8)
 app.setFont(font)
 
-mw = MainWindow(r"C:\Users\ipetrash\Music\Эпоха – Ценой великих жертв.mp3")
+mw = MainWindow(parsed_args.music_file)
 mw.show()
 
 sys.exit(app.exec_())

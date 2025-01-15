@@ -4,6 +4,8 @@
 __author__ = "ipetrash"
 
 
+from pathlib import Path
+
 from PyQt5.QtCore import QTimer, QTime, QUrl, QSettings, QEvent
 from PyQt5.QtGui import QCloseEvent, QIcon
 from PyQt5.QtMultimedia import QMediaPlaylist, QMediaPlayer, QMediaContent
@@ -24,8 +26,11 @@ def add_to_current_time(t: QTime) -> QTime:
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, audio_file_name: str):
+    def __init__(self, audio_file_name: str | Path):
         super().__init__()
+
+        if isinstance(audio_file_name, Path):
+            audio_file_name = str(audio_file_name)
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
