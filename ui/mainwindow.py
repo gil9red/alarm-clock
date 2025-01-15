@@ -35,6 +35,8 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        self.ui.time_remaining.clear()
+
         self.icon_alarm_clock = QIcon(str(DIR_ICONS / "alarm-clock.png"))
 
         self.setWindowIcon(self.icon_alarm_clock)
