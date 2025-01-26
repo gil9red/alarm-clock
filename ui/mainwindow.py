@@ -5,9 +5,10 @@ __author__ = "ipetrash"
 
 
 import sys
+import traceback
 from pathlib import Path
 
-from PyQt5.QtCore import QTimer, QTime, QUrl, QSettings, QEvent
+from PyQt5.QtCore import Qt, QTimer, QTime, QUrl, QSettings, QEvent
 from PyQt5.QtGui import QCloseEvent, QIcon
 from PyQt5.QtMultimedia import QMediaPlaylist, QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import (
@@ -16,11 +17,30 @@ from PyQt5.QtWidgets import (
     QSystemTrayIcon,
     QMenu,
     QMessageBox,
+    QWidget,
+    QSlider,
+    QLabel,
+    QToolButton,
+    QStyle,
+    QHBoxLayout,
+    QVBoxLayout,
 )
 
 from ui.mainwindow_ui import Ui_MainWindow
 
 from config import SETTINGS_FILE_NAME, DIR_ICONS
+
+
+def log_uncaught_exceptions(ex_cls, ex, tb):
+    text = f"{ex_cls.__name__}: {ex}:\n"
+    text += "".join(traceback.format_tb(tb))
+
+    print(text)
+    QMessageBox.critical(None, "Error", text)
+    sys.exit(1)
+
+
+sys.excepthook = log_uncaught_exceptions
 
 
 def get_total_seconds(t: QTime) -> int:
@@ -30,6 +50,81 @@ def get_total_seconds(t: QTime) -> int:
 def add_to_current_time(t: QTime) -> QTime:
     secs = get_total_seconds(t)
     return QTime.currentTime().addSecs(secs)
+
+
+class PlayerView(QWidget):
+    def __init__(self, player: QMediaPlayer):
+        super().__init__()
+
+        self.duration_slider = QSlider(Qt.Horizontal)
+        self.duration_slider.setEnabled(False)
+
+        self.duration_label = QLabel()
+
+        self.mute_button = QToolButton()
+        self.mute_button.setEnabled(False)
+        self.mute_button.setAutoRaise(True)
+        self.mute_button.setIcon(self.style().standardIcon(QStyle.SP_MediaVolume))
+
+        self.volume_slider = QSlider(Qt.Horizontal)
+        self.volume_slider.setEnabled(False)
+        self.volume_slider.setRange(0, 100)
+
+        self.player = player
+        self.player.durationChanged.connect(
+            lambda duration: self.duration_slider.setRange(0, duration // 1000)
+        )
+        self.player.positionChanged.connect(self._position_changed)
+        self.player.volumeChanged.connect(self.volume_slider.setValue)
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.duration_slider)
+        layout.addWidget(self.duration_label)
+
+        layout_buttons = QHBoxLayout()
+        layout_buttons.setContentsMargins(0, 0, 0, 0)
+        layout_buttons.setSpacing(0)
+        layout_buttons.addWidget(self.mute_button)
+        layout_buttons.addWidget(self.volume_slider)
+
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.addLayout(layout)
+        main_layout.addLayout(layout_buttons)
+        self.setLayout(main_layout)
+
+    def _position_changed(self, pos: int):
+        # TODO: с этим условием при кликах на тело слайдера, ползунок слайдера сдвинется
+        # но медиа не будет перемотано
+        if not self.duration_slider.isSliderDown():
+            self.duration_slider.setValue(pos // 1000)
+
+        self._update_duration_info()
+
+    def _update_duration_info(self):
+        ms_pattern = "{:0>2}:{:0>2}"
+        hms_pattern = "{}:" + ms_pattern
+
+        seconds = self.duration_slider.value()
+        current_minutes, current_seconds = divmod(seconds, 60)
+        current_hours, current_minutes = divmod(current_minutes, 60)
+        if current_hours > 0:
+            current = hms_pattern.format(
+                current_hours, current_minutes, current_seconds
+            )
+        else:
+            current = ms_pattern.format(current_minutes, current_seconds)
+
+        total_seconds = self.duration_slider.maximum()
+        total_minutes, total_seconds = divmod(total_seconds, 60)
+        total_hours, total_minutes = divmod(total_minutes, 60)
+        if total_hours > 0:
+            total = hms_pattern.format(total_hours, total_minutes, total_seconds)
+        else:
+            total = ms_pattern.format(total_minutes, total_seconds)
+
+        self.duration_label.setText(current + " / " + total)
 
 
 class MainWindow(QMainWindow):
@@ -94,6 +189,15 @@ class MainWindow(QMainWindow):
         self.player = QMediaPlayer()
         self.player.setPlaylist(self.playlist)
 
+        self.player_controls_view = PlayerView(self.player)
+        self.ui.gridLayout.addWidget(
+            self.player_controls_view,
+            self.ui.gridLayout.rowCount(),  # row
+            0,  # column
+            2,  # rowSpan
+            0,  # columnSpan
+        )
+
         self._update_states()
 
     def _update_states(self):
@@ -110,6 +214,8 @@ class MainWindow(QMainWindow):
             self.ui.start_stop.setText("Стоп")
         else:
             self.ui.start_stop.setText("Запустить")
+
+        self.player_controls_view.setVisible(self._woke_up)
 
         # Корректируем высоту окна после возможного скрытия кнопок
         self.resize(self.width(), self.minimumHeight())
@@ -233,3 +339,4 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent):
         self.write_settings()
+        self._i_woke_up()
