@@ -158,6 +158,8 @@ class MainWindow(QMainWindow):
         self.tray.activated.connect(self._on_tray_activated)
         self.tray.show()
 
+        self.windowTitleChanged.connect(self.tray.setToolTip)
+
         self.read_settings()
 
         self._button_group = QButtonGroup()
@@ -247,6 +249,7 @@ class MainWindow(QMainWindow):
         self.ui.time_remaining.setText(
             f"Звонок в {alarm_str}. Осталось: {hh:0>2}:{mm:0>2}:{ss:0>2}"
         )
+        self.setWindowTitle(f"Будильник. {self.ui.time_remaining.text()}")
 
     def _i_woke_up(self):
         self._woke_up = False
