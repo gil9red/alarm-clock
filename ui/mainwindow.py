@@ -31,7 +31,7 @@ from ui.mainwindow_ui import Ui_MainWindow
 from config import SETTINGS_FILE_NAME, DIR_ICONS
 
 
-def log_uncaught_exceptions(ex_cls, ex, tb):
+def log_uncaught_exceptions(ex_cls, ex, tb) -> None:
     text = f"{ex_cls.__name__}: {ex}:\n"
     text += "".join(traceback.format_tb(tb))
 
@@ -53,7 +53,7 @@ def add_to_current_time(t: QTime) -> QTime:
 
 
 class PlayerView(QWidget):
-    def __init__(self, player: QMediaPlayer):
+    def __init__(self, player: QMediaPlayer) -> None:
         super().__init__()
 
         self.duration_slider = QSlider(Qt.Horizontal)
@@ -94,7 +94,7 @@ class PlayerView(QWidget):
         main_layout.addLayout(layout_buttons)
         self.setLayout(main_layout)
 
-    def _position_changed(self, pos: int):
+    def _position_changed(self, pos: int) -> None:
         # TODO: с этим условием при кликах на тело слайдера, ползунок слайдера сдвинется
         # но медиа не будет перемотано
         if not self.duration_slider.isSliderDown():
@@ -102,7 +102,7 @@ class PlayerView(QWidget):
 
         self._update_duration_info()
 
-    def _update_duration_info(self):
+    def _update_duration_info(self) -> None:
         ms_pattern = "{:0>2}:{:0>2}"
         hms_pattern = "{}:" + ms_pattern
 
@@ -128,7 +128,7 @@ class PlayerView(QWidget):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, audio_file_name: Path):
+    def __init__(self, audio_file_name: Path) -> None:
         super().__init__()
 
         if not audio_file_name.exists():
@@ -202,7 +202,7 @@ class MainWindow(QMainWindow):
 
         self._update_states()
 
-    def _update_states(self):
+    def _update_states(self) -> None:
         self.ui.at_time.setEnabled(self.ui.at_time_rb.isChecked())
         self.ui.through_time.setEnabled(self.ui.through_time_rb.isChecked())
         self.ui.i_woke_up.setVisible(self._woke_up)
@@ -222,13 +222,13 @@ class MainWindow(QMainWindow):
         # Корректируем высоту окна после возможного скрытия кнопок
         self.resize(self.width(), self.minimumHeight())
 
-    def _inc_volume_tick(self):
+    def _inc_volume_tick(self) -> None:
         if self.player.volume() >= 100:
             self._timer_inc_volume.stop()
 
         self.player.setVolume(self.player.volume() + 1)
 
-    def _tick(self):
+    def _tick(self) -> None:
         remain = QTime.currentTime().secsTo(self._alarm_time)
         if remain < 0:
             remain += 24 * 3600
@@ -251,12 +251,12 @@ class MainWindow(QMainWindow):
         )
         self.setWindowTitle(f"Будильник. {self.ui.time_remaining.text()}")
 
-    def _i_woke_up(self):
+    def _i_woke_up(self) -> None:
         self._woke_up = False
         self.player.stop()
         self._update_states()
 
-    def _start(self):
+    def _start(self) -> None:
         self._woke_up = False
 
         if self.ui.at_time_rb.isChecked():
@@ -268,18 +268,18 @@ class MainWindow(QMainWindow):
         self._timer.start()
         self._update_states()
 
-    def _stop(self):
+    def _stop(self) -> None:
         self._woke_up = False
         self._timer.stop()
         self._update_states()
 
-    def _start_stop(self):
+    def _start_stop(self) -> None:
         if self.ui.start_stop.isChecked():
             self._start()
         else:
             self._stop()
 
-    def _more_sleep(self):
+    def _more_sleep(self) -> None:
         self._i_woke_up()
 
         t = self.ui.through_time.time()
@@ -289,27 +289,27 @@ class MainWindow(QMainWindow):
         self.ui.start_stop.setChecked(True)
         self._update_states()
 
-    def _set_visible(self, visible: bool):
+    def _set_visible(self, visible: bool) -> None:
         self.setVisible(visible)
 
         if visible:
             self.showNormal()
             self.activateWindow()
 
-    def _on_tray_activated(self, reason: QSystemTrayIcon.ActivationReason):
+    def _on_tray_activated(self, reason: QSystemTrayIcon.ActivationReason) -> None:
         if reason == QSystemTrayIcon.ActivationReason.Context:
             return
 
         self._set_visible(not self.isVisible())
 
-    def changeEvent(self, event: QEvent):
+    def changeEvent(self, event: QEvent) -> None:
         if event.type() == QEvent.WindowStateChange:
             # Если окно свернули
             if self.isMinimized():
                 # Прячем окно с панели задач
                 QTimer.singleShot(0, self.hide)
 
-    def read_settings(self):
+    def read_settings(self) -> None:
         ini = QSettings(SETTINGS_FILE_NAME, QSettings.IniFormat)
 
         if state := ini.value("MainWindow_State"):
@@ -330,7 +330,7 @@ class MainWindow(QMainWindow):
         if through_time := ini.value("through_time"):
             self.ui.through_time.setTime(through_time)
 
-    def write_settings(self):
+    def write_settings(self) -> None:
         ini = QSettings(SETTINGS_FILE_NAME, QSettings.IniFormat)
         ini.setValue("MainWindow_State", self.saveState())
         ini.setValue("MainWindow_Geometry", self.saveGeometry())
@@ -340,6 +340,6 @@ class MainWindow(QMainWindow):
         ini.setValue("at_time", self.ui.at_time.time())
         ini.setValue("through_time", self.ui.through_time.time())
 
-    def closeEvent(self, event: QCloseEvent):
+    def closeEvent(self, event: QCloseEvent) -> None:
         self.write_settings()
         self._i_woke_up()
