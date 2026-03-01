@@ -169,7 +169,7 @@ class MainWindow(QMainWindow):
 
         self.ui.start_stop.clicked.connect(self._start_stop)
         self.ui.more_sleep.clicked.connect(self._more_sleep)
-        self.ui.i_woke_up.clicked.connect(self._i_woke_up)
+        self.ui.i_woke_up.clicked.connect(self._stop)
 
         self._timer = QTimer()
         self._timer.setInterval(100)
@@ -251,11 +251,6 @@ class MainWindow(QMainWindow):
         )
         self.setWindowTitle(f"Будильник. {self.ui.time_remaining.text()}")
 
-    def _i_woke_up(self) -> None:
-        self._woke_up = False
-        self.player.stop()
-        self._update_states()
-
     def _start(self) -> None:
         self._woke_up = False
 
@@ -270,7 +265,9 @@ class MainWindow(QMainWindow):
 
     def _stop(self) -> None:
         self._woke_up = False
+        self.player.stop()
         self._timer.stop()
+        self._timer_inc_volume.stop()
         self._update_states()
 
     def _start_stop(self) -> None:
@@ -280,7 +277,7 @@ class MainWindow(QMainWindow):
             self._stop()
 
     def _more_sleep(self) -> None:
-        self._i_woke_up()
+        self._stop()
 
         t = self.ui.through_time.time()
         self._alarm_time = add_to_current_time(t)
@@ -342,4 +339,4 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent) -> None:
         self.write_settings()
-        self._i_woke_up()
+        self._stop()
