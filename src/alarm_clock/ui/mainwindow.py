@@ -8,10 +8,10 @@ import sys
 import traceback
 from pathlib import Path
 
-from qtpy.QtCore import Qt, QTimer, QTime, QUrl, QSettings, QEvent
-from qtpy.QtGui import QCloseEvent, QIcon
-from qtpy.QtMultimedia import QMediaPlayer, QAudioOutput
-from qtpy.QtWidgets import (
+from PyQt6.QtCore import Qt, QTimer, QTime, QUrl, QSettings, QEvent
+from PyQt6.QtGui import QCloseEvent, QIcon
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PyQt6.QtWidgets import (
     QMainWindow,
     QButtonGroup,
     QSystemTrayIcon,
@@ -26,9 +26,9 @@ from qtpy.QtWidgets import (
     QVBoxLayout,
 )
 
-from ui.mainwindow_ui import Ui_MainWindow
-
-from config import SETTINGS_FILE_NAME, DIR_ICONS
+from alarm_clock import __version__
+from alarm_clock.config import SETTINGS_FILE_NAME, DIR_ICONS
+from alarm_clock.ui.mainwindow_ui import Ui_MainWindow
 
 
 def log_uncaught_exceptions(ex_cls, ex, tb) -> None:
@@ -232,6 +232,11 @@ class MainWindow(QMainWindow):
         # Корректируем высоту окна после возможного скрытия кнопок
         self.resize(self.width(), self.minimumHeight())
 
+        info: str = ""
+        if self._timer.isActive():
+            info = f". {self.ui.time_remaining.text()}"
+        self.setWindowTitle(f"Будильник{info} (v{__version__})")
+
     def _inc_volume_tick(self) -> None:
         new_vol: float = round(self.player.audioOutput().volume() + 0.01, 2)
         if new_vol <= 1.0:
@@ -246,7 +251,6 @@ class MainWindow(QMainWindow):
         elif remain == 0:
             self._woke_up = True
             self._timer.stop()
-            self._update_states()
 
             self.player.audioOutput().setVolume(0.01)
             self.player.play()
@@ -260,7 +264,7 @@ class MainWindow(QMainWindow):
         self.ui.time_remaining.setText(
             f"Звонок в {alarm_str}. Осталось: {hh:0>2}:{mm:0>2}:{ss:0>2}"
         )
-        self.setWindowTitle(f"Будильник. {self.ui.time_remaining.text()}")
+        self._update_states()
 
     def _start(self) -> None:
         self._woke_up = False

@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "alarm-clock"
+dynamic = ["version"]
+description = "My alarm clock"
+authors = [
+    { name = "Ilya Petrash (gil9red)", email = "ilya.petrash@inbox.ru" },
+]
+maintainers = [
+    { name = "Ilya Petrash (gil9red)", email = "ilya.petrash@inbox.ru" },
+]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.txt"]
+keywords = ["pyqt6", "alarm", "clock", "utility", "gui", "multimedia"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Utilities",
+    "Topic :: Multimedia :: Sound/Audio",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: Microsoft :: Windows",
+    "Environment :: Win32 (MS Windows)",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "pyqt6>=6.10.2",
+]
+
+[project.scripts]
+alarm-clock = "alarm_clock.main:main"
+
+[project.urls]
+Homepage = "https://github.com/gil9red/alarm-clock"
+Repository = "https://github.com/gil9red/alarm-clock"
+Issues = "https://github.com/gil9red/alarm-clock/issues"
+
+[tool.hatch.version]
+path = "src/alarm_clock/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/alarm_clock"]
