@@ -11,7 +11,7 @@ import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-from PyQt5.QtWidgets import QApplication
+from qtpy.QtWidgets import QApplication
 
 from config import MUSIC_PATH
 from ui.mainwindow import MainWindow

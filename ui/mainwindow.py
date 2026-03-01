@@ -8,10 +8,10 @@ import sys
 import traceback
 from pathlib import Path
 
-from PyQt5.QtCore import Qt, QTimer, QTime, QUrl, QSettings, QEvent
-from PyQt5.QtGui import QCloseEvent, QIcon
-from PyQt5.QtMultimedia import QMediaPlaylist, QMediaPlayer, QMediaContent
-from PyQt5.QtWidgets import (
+from qtpy.QtCore import Qt, QTimer, QTime, QUrl, QSettings, QEvent
+from qtpy.QtGui import QCloseEvent, QIcon
+from qtpy.QtMultimedia import QMediaPlayer, QAudioOutput
+from qtpy.QtWidgets import (
     QMainWindow,
     QButtonGroup,
     QSystemTrayIcon,
@@ -56,7 +56,7 @@ class PlayerView(QWidget):
     def __init__(self, player: QMediaPlayer) -> None:
         super().__init__()
 
-        self.duration_slider = QSlider(Qt.Horizontal)
+        self.duration_slider = QSlider(Qt.Orientation.Horizontal)
         self.duration_slider.setEnabled(False)
 
         self.duration_label = QLabel()
@@ -64,9 +64,11 @@ class PlayerView(QWidget):
         self.mute_button = QToolButton()
         self.mute_button.setEnabled(False)
         self.mute_button.setAutoRaise(True)
-        self.mute_button.setIcon(self.style().standardIcon(QStyle.SP_MediaVolume))
+        self.mute_button.setIcon(
+            self.style().standardIcon(QStyle.StandardPixmap.SP_MediaVolume)
+        )
 
-        self.volume_slider = QSlider(Qt.Horizontal)
+        self.volume_slider = QSlider(Qt.Orientation.Horizontal)
         self.volume_slider.setEnabled(False)
         self.volume_slider.setRange(0, 100)
 
@@ -75,7 +77,9 @@ class PlayerView(QWidget):
             lambda duration: self.duration_slider.setRange(0, duration // 1000)
         )
         self.player.positionChanged.connect(self._position_changed)
-        self.player.volumeChanged.connect(self.volume_slider.setValue)
+        self.player.audioOutput().volumeChanged.connect(
+            lambda volume: self.volume_slider.setValue(int(volume * 100))
+        )
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -179,17 +183,17 @@ class MainWindow(QMainWindow):
         self._timer_inc_volume.setInterval(500)
         self._timer_inc_volume.timeout.connect(self._inc_volume_tick)
 
-        self._woke_up = False
-        self._alarm_time: QTime = None
-
-        self.playlist = QMediaPlaylist()
-        self.playlist.setPlaybackMode(QMediaPlaylist.Loop)
+        self._woke_up: bool = False
+        self._alarm_time: QTime | None = None
 
         url = QUrl.fromLocalFile(str(audio_file_name))
-        self.playlist.addMedia(QMediaContent(url))
 
-        self.player = QMediaPlayer()
-        self.player.setPlaylist(self.playlist)
+        self.player = QMediaPlayer(self)
+        self.player.setAudioOutput(QAudioOutput(self.player))
+        self.player.setSource(url)
+
+        # Подключаем проверку статуса
+        self.player.mediaStatusChanged.connect(self._player_handle_status)
 
         self.player_controls_view = PlayerView(self.player)
         self.ui.gridLayout.addWidget(
@@ -201,6 +205,12 @@ class MainWindow(QMainWindow):
         )
 
         self._update_states()
+
+    def _player_handle_status(self, status: QMediaPlayer.MediaStatus) -> None:
+        # Если файл доиграл до конца (EndOfMedia)
+        if status == QMediaPlayer.MediaStatus.EndOfMedia:
+            self.player.setPosition(0)  # Перематываем в начало
+            self.player.play()  # Запускаем снова
 
     def _update_states(self) -> None:
         self.ui.at_time.setEnabled(self.ui.at_time_rb.isChecked())
@@ -223,10 +233,11 @@ class MainWindow(QMainWindow):
         self.resize(self.width(), self.minimumHeight())
 
     def _inc_volume_tick(self) -> None:
-        if self.player.volume() >= 100:
+        new_vol: float = round(self.player.audioOutput().volume() + 0.01, 2)
+        if new_vol <= 1.0:
+            self.player.audioOutput().setVolume(new_vol)
+        else:
             self._timer_inc_volume.stop()
-
-        self.player.setVolume(self.player.volume() + 1)
 
     def _tick(self) -> None:
         remain = QTime.currentTime().secsTo(self._alarm_time)
@@ -237,7 +248,7 @@ class MainWindow(QMainWindow):
             self._timer.stop()
             self._update_states()
 
-            self.player.setVolume(1)
+            self.player.audioOutput().setVolume(0.01)
             self.player.play()
             self._timer_inc_volume.start()
             self._set_visible(True)
@@ -300,14 +311,14 @@ class MainWindow(QMainWindow):
         self._set_visible(not self.isVisible())
 
     def changeEvent(self, event: QEvent) -> None:
-        if event.type() == QEvent.WindowStateChange:
+        if event.type() == QEvent.Type.WindowStateChange:
             # Если окно свернули
             if self.isMinimized():
                 # Прячем окно с панели задач
                 QTimer.singleShot(0, self.hide)
 
     def read_settings(self) -> None:
-        ini = QSettings(SETTINGS_FILE_NAME, QSettings.IniFormat)
+        ini = QSettings(SETTINGS_FILE_NAME, QSettings.Format.IniFormat)
 
         if state := ini.value("MainWindow_State"):
             self.restoreState(state)
@@ -328,7 +339,7 @@ class MainWindow(QMainWindow):
             self.ui.through_time.setTime(through_time)
 
     def write_settings(self) -> None:
-        ini = QSettings(SETTINGS_FILE_NAME, QSettings.IniFormat)
+        ini = QSettings(SETTINGS_FILE_NAME, QSettings.Format.IniFormat)
         ini.setValue("MainWindow_State", self.saveState())
         ini.setValue("MainWindow_Geometry", self.saveGeometry())
 
