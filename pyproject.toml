@@ -36,7 +36,7 @@ dependencies = [
     "pyqt6>=6.10.2",
 ]
 
-[project.scripts]
+[project.gui-scripts]
 alarm-clock = "alarm_clock.main:main"
 
 [project.urls]
