@@ -1,7 +1,3 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "alarm-clock"
 dynamic = ["version"]
@@ -43,6 +39,10 @@ alarm-clock = "alarm_clock.main:main"
 Homepage = "https://github.com/gil9red/alarm-clock"
 Repository = "https://github.com/gil9red/alarm-clock"
 Issues = "https://github.com/gil9red/alarm-clock/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.hatch.version]
 path = "src/alarm_clock/__init__.py"
