@@ -175,6 +175,8 @@ class MainWindow(QMainWindow):
         self.ui.more_sleep.clicked.connect(self._more_sleep)
         self.ui.i_woke_up.clicked.connect(self._stop)
 
+        self.ui.start_stop.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
         self._timer = QTimer()
         self._timer.setInterval(100)
         self._timer.timeout.connect(self._tick)
